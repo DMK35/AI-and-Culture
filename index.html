@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakweri Heritage Hub</title>
+    <style>
+        :root {
+            --primary-green: #0d4711;
+            --secondary-green: #4b974e;
+            --white: #e0fae0;
+            --light-gray: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--primary-green);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            z-index: 10;
+            background-color: var(--white);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-green);
+        }
+
+        /* --- LANDING PAGE CONTAINER --- */
+        .container {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            transition: all 0.5s ease;
+        }
+
+        .option-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: var(--white);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .games-bg { background: linear-gradient(45deg, var(--primary-green) 0%, var(--secondary-green) 100%); }
+        .lang-bg { background: var(--white); color: var(--primary-green) !important; }
+        .lang-bg .content { background: rgba(27, 94, 32, 0.05); border: 1px solid var(--primary-green); }
+        .lang-bg .btn { border-color: var(--primary-green); color: var(--primary-green); }
+
+        .option-card:hover {
+            flex: 1.5;
+            filter: brightness(1.1);
+        }
+
+        .content {
+            text-align: center;
+            z-index: 2;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            width: 85%;
+            max-width: 400px;
+        }
+
+        .icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
+        h2 { font-size: 2rem; margin-bottom: 1rem; }
+        p { font-size: 1rem; opacity: 0.9; margin-bottom: 1.5rem; line-height: 1.4; }
+
+        .btn {
+            padding: 10px 25px;
+            border: 2px solid white;
+            border-radius: 25px;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .option-card:hover .btn {
+            background: var(--primary-green);
+            color: var(--white) !important;
+            border-color: var(--primary-green);
+        }
+
+        /* --- GAME & AI OVERLAYS --- */
+        #game-overlay, #ai-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--white);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .back-btn { align-self: flex-start; padding: 10px; cursor: pointer; color: var(--primary-green); font-weight: bold; }
+
+        /* Bead Game Style */
+        .bead-area { display: flex; gap: 10px; margin: 40px; }
+        .bead { width: 50px; height: 50px; background: var(--secondary-green); border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .bead.collected { transform: translateY(100px); opacity: 0.3; }
+
+        /* AI Tutor Style */
+        #chat-box { width: 100%; max-width: 500px; height: 300px; border: 2px solid var(--primary-green); overflow-y: auto; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .bot-msg { background: #a9d2ac; padding: 8px; border-radius: 5px; margin-bottom: 5px; }
+        .user-msg { text-align: right; color: var(--secondary-green); margin-bottom: 5px; }
+
+        @media (max-width: 768px) { .container { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Heritage Hub</h1>
+    </header>
+
+    <div class="container">
+        <div class="option-card games-bg" onclick="openOverlay('game-overlay')">
+            <div class="content">
+                <span class="icon">🧮</span>
+                <h2>Counting Game</h2>
+                <p>Learn to count in Bakweri by collecting traditional beads.</p>
+                <div class="btn">Play Now</div>
+            </div>
+        </div>
+
+        <div class="option-card lang-bg" onclick="openOverlay('ai-overlay')">
+            <div class="content">
+                <span class="icon">🤖</span>
+                <h2>Bakweri Tutor</h2>
+                <p>Chat with our AI to learn phrases and vocabulary instantly.</p>
+                <div class="btn">Start Learning</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-overlay">
+        <div class="back-btn" onclick="closeOverlays()">⬅ Back Home</div>
+        <h2>Count the Beads: <span id="target-word">Ewoko (1)</span></h2>
+        <p>Tap the beads to count!</p>
+        <div class="bead-area" id="bead-container"></div>
+        <button class="btn" style="background: var(--primary-green); color: white;" onclick="resetBeads()">Next Number</button>
+    </div>
+
+    <div id="ai-overlay">
+        <div class="back-btn" onclick="closeOverlays()">⬅ Back Home</div>
+        <h2>Bakweri AI Tutor</h2>
+        <div id="chat-box">
+            <div class="bot-msg">A-li-o-li (Hello)! I am your Bakweri tutor. Ask me how to say something!</div>
+        </div>
+        <div style="display:flex; gap:5px; width: 100%; max-width: 500px;">
+            <input type="text" id="user-input" placeholder="Type 'Hello' or 'Count'..." style="flex:1; padding: 10px; border-radius: 20px; border: 1px solid var(--primary-green);">
+            <button class="btn" style="background: var(--primary-green); color:white;" onclick="askAI()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const bakweriNumbers = ["yoko", "wewa", "weyaw", "weni", "weta", "Motowa", "yamba", "Wambi", "Lowa", "leome"];
+        let currentNum = 0;
+
+        function openOverlay(id) {
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'game-overlay') resetBeads();
+        }
+
+        function closeOverlays() {
+            document.getElementById('game-overlay').style.display = 'none';
+            document.getElementById('ai-overlay').style.display = 'none';
+        }
+
+        // --- BEAD GAME LOGIC ---
+        function resetBeads() {
+            const container = document.getElementById('bead-container');
+            container.innerHTML = '';
+            currentNum = (currentNum % 10) + 1;
+            document.getElementById('target-word').innerText = `${bakweriNumbers[currentNum-1]} (${currentNum})`;
+            
+            for(let i=0; i < currentNum; i++) {
+                let bead = document.createElement('div');
+                bead.className = 'bead';
+                bead.onclick = function() { this.classList.add('collected'); };
+                container.appendChild(bead);
+            }
+        }
+
+        // --- AI TUTOR LOGIC ---
+        const dictionary = {
+            "good morning": "eli ya gbamou",
+            "hello": "jongo",
+            "i am ": "naweli",
+            "thank you": "na somi saisai",
+            "welcome": "Lowane",
+            "count": "Let's count! 1 is yoko, 2 is wewa, 3 is weyaw...",
+        };
+
+        function askAI() {
+            const input = document.getElementById('user-input').value.toLowerCase();
+            const chat = document.getElementById('chat-box');
+            if(!input) return;
+
+            chat.innerHTML += `<div class="user-msg">${input}</div>`;
+            
+            let response = "I'm still learning that! Try asking 'Hello', 'How are you', or 'Count'.";
+            for(let key in dictionary) {
+                if(input.includes(key)) response = dictionary[key];
+            }
+
+            setTimeout(() => {
+                chat.innerHTML += `<div class="bot-msg">${response}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 500);
+            
+            document.getElementById('user-input').value = '';
+        }
+    </script>
+</body>
+</html>
